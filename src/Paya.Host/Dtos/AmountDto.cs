@@ -1,7 +1,8 @@
-﻿namespace Paya.Host.Domain.Account.Entities
+﻿namespace Paya.Host.Dtos
 {
-    public class UserAccount : BaseEntity
+    public class AmountDto
     {
+        public int Id { get; set; }
         public int UserId { get; set; }
         public decimal Balance { get; set; }
         public decimal ReservedAmount { get; set; }

@@ -4,6 +4,8 @@ namespace Paya.Host.Services.Contracts
 {
     public interface IAccountService
     {
-        Task ReserveAmount(int userId, decimal amount);
+        Task ReserveAmount(ReserveAmountDto reserveAmountDto);
+
+        Task UpdateReserveAmount(UpdateReserveAmountDto updateReserveAmountDto);
     }
 }

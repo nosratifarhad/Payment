@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Options;
 using Paya.Host.Domain.Transfer;
 using Paya.Host.Domain.Transfer.Entities;
-using Paya.Host.Dtos;
 using Paya.Host.Options;
 using System.Data;
 using System.Data.SqlClient;
@@ -29,6 +28,36 @@ namespace Paya.Host.Repositories
 
                 return transferRequestId;
             }
+        }
+
+        public async Task UpdateTransferRequest(TransferRequest transferRequest)
+        {
+            string command = GetUpdateTransferRequestCommand();
+            var parameters = GetUpdateTransferRequestParamters(transferRequest);
+
+            using (var connection = new SqlConnection(_payaOptions.WriteContext))
+            {
+                await connection.ExecuteAsync(command, parameters)
+                                                        .ConfigureAwait(false);
+            }
+        }
+
+        private string GetUpdateTransferRequestCommand()
+            => @"UPDATE [transfer].[TransferRequest]
+                    SET 
+	                    TransferStatus = @TransferStatus ,    
+                        Note = @Note
+                    WHERE Id = @Id";
+
+        private DynamicParameters GetUpdateTransferRequestParamters(TransferRequest transferRequest)
+        {
+            var paramters = new DynamicParameters();
+
+            paramters.Add("Id", transferRequest.Id, DbType.Int32);
+            paramters.Add("TransferStatus", transferRequest.TransferStatus.ToString(), DbType.String);
+            paramters.Add("Note", transferRequest.Note, DbType.String);
+
+            return paramters;
         }
 
         private string GetInsertTransferRequestCommand()

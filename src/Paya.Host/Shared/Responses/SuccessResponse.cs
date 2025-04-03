@@ -1,10 +1,8 @@
-﻿using Paya.Host.Dtos;
-
-namespace Paya.Host.Shared.Responses
+﻿namespace Paya.Host.Shared.Responses
 {
-    public class SuccessResponse
+    public class SuccessResponse<T>
     {
         public string Message { get; set; }
-        public SuccessTransferResponse request { get; set; }
+        public T request { get; set; }
     }
 }

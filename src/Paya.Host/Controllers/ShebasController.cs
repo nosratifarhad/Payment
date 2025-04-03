@@ -1,8 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Paya.Host.Features.Sheba.Commands.InitiateTransfer;
-using Paya.Host.Features.Sheba.Commands.UpdateInitiateTransfer;
-using Paya.Host.Features.Sheba.Queries.GetTransferRequestList;
+using Paya.Host.Features.Sheba.Commands.InitiateTransferRequest;
+using Paya.Host.Features.Sheba.Commands.UpdateInitiateTransferRequest;
+using Paya.Host.Features.Sheba.Queries.GetTransferRequests;
 
 namespace Paya.Host.Controllers
 {
@@ -14,25 +14,27 @@ namespace Paya.Host.Controllers
         public ShebasController(IMediator mediator) => _mediator = mediator;
 
         [HttpPost("api/sheba")]
-        public async Task<IActionResult> InitiateTransfer([FromBody] InitiateTransferCommand command)
+        public async Task<IActionResult> InitiateTransferRequest([FromBody] InitiateTransferRequestCommand command)
         {
-            await _mediator.Send(command);
+            command.UserId = 1; //Get from token
 
-            return Created();
+            var response = await _mediator.Send(command);
+
+            return Created("", response);
         }
 
         [HttpGet("api/sheba")]
-        public async Task<IActionResult> GetTransferRequestList()
+        public async Task<IActionResult> GetTransferRequests()
         {
-            var query = new GetTransferRequestListQuery();
+            var query = new GetTransferRequestsQuery();
 
-            var basket = await _mediator.Send(query);
+            var transferRequestCollectionDto = await _mediator.Send(query);
 
-            return Ok(basket);
+            return Ok(transferRequestCollectionDto);
         }
 
         [HttpPut("api/sheba/{request-id}")]
-        public async Task<IActionResult> UpdateInitiateTransfer([FromBody] UpdateInitiateTransferCommand command, int requestId)
+        public async Task<IActionResult> UpdateInitiateTransfer([FromBody] UpdateInitiateTransferRequestCommand command, int requestId)
         {
             if (requestId == 0)
                 return BadRequest();

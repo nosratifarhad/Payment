@@ -3,7 +3,7 @@
     public enum TransferRequestStatus
     {
         None = 0,
-        Reserved = 1,
+        Pending = 1,
         Approved = 2,
         Confirmed = 3,
         Canceled = 4,
