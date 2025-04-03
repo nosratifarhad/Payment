@@ -4,6 +4,6 @@ namespace Paya.Host.Domain.Transfer
 {
     public interface ITransactionWriteRepository
     {
-        Task CreateTransferRequest(Transaction transaction);
+        Task CreateTransaction(Transaction transaction);
     }
 }

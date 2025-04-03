@@ -30,9 +30,10 @@ namespace Paya.Host.Repositories
         }
 
         private string GetUpdateUserAccountCommand()
-              => @"UPDATE [identity].[User]
+              => @"UPDATE [UserAccount]
                     SET 
 	                    UpdateAt = @UpdateAt ,    
+                        ReservedAmount  = @ReservedAmount ,
                         Balance = @Balance
                     WHERE Id = @Id";
 
@@ -41,8 +42,9 @@ namespace Paya.Host.Repositories
             var paramters = new DynamicParameters();
 
             paramters.Add("Id", userAccount.Id, DbType.Int32, null);
+            paramters.Add("ReservedAmount ", userAccount.ReservedAmount, DbType.Decimal, null);
+            paramters.Add("Balance ", userAccount.Balance, DbType.Decimal, null);
             paramters.Add("UpdateAt", userAccount.UpdateAt, DbType.DateTime, null);
-            paramters.Add("Balance", userAccount.Balance, DbType.Decimal, null);
 
             return paramters;
         }

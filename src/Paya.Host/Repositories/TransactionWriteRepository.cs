@@ -17,11 +17,11 @@ namespace Paya.Host.Repositories
             _payaOptions = payaOptions.Value;
         }
 
-        public async Task CreateTransferRequest(Transaction transaction)
+        public async Task CreateTransaction(Transaction transaction)
         {
-            string command = GetInsertTransactionCommand();
+            string command = GetCreateTransactionCommand();
 
-            var parameters = GetTransactionParameters(transaction);
+            var parameters = GetCreateTransactionParameters(transaction);
 
             using (var connection = new SqlConnection(_payaOptions.WriteContext))
             {
@@ -30,20 +30,19 @@ namespace Paya.Host.Repositories
             }
         }
 
-        private string GetInsertTransactionCommand()
+        private string GetCreateTransactionCommand()
             => @"INSERT INTO [transaction].[Transaction]
-                    (TransferRequestId, Price, Description, TransactionType, CreatedAt)
+                    (TransferRequestId, Price, TransactionType, CreatedAt)
                 VALUES
-                    (@TransferRequestId, @Price, @Description, @TransactionType, @CreatedAt)";
+                    (@TransferRequestId, @Price, @TransactionType, @CreatedAt)";
 
-        private DynamicParameters GetTransactionParameters(Transaction transaction)
+        private DynamicParameters GetCreateTransactionParameters(Transaction transaction)
         {
             var parameters = new DynamicParameters();
 
             parameters.Add("TransferRequestId", transaction.TransferRequestId, DbType.Int32);
             parameters.Add("Price", transaction.Price, DbType.Decimal);
-            parameters.Add("Description", transaction.Description, DbType.String);
-            parameters.Add("TransactionType", transaction.TransactionType.ToString(), DbType.String);
+            parameters.Add("TransactionType", transaction.TransactionType, DbType.Int32);
             parameters.Add("CreatedAt", DateTime.UtcNow, DbType.DateTime);
 
             return parameters;

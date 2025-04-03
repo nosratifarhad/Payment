@@ -1,8 +1,8 @@
 ﻿using Paya.Host.Domain.Transfer.Enums;
 
-namespace Paya.Host.Domain.Transfer.Entities
+namespace Paya.Host.Dtos
 {
-    public class TransferRequest : BaseEntity
+    public class InitiateTransferRequestDto
     {
         public int UserId { get; set; }
         public decimal Price { get; set; }
@@ -10,5 +10,7 @@ namespace Paya.Host.Domain.Transfer.Entities
         public string ToShebaNumber { get; set; }
         public string Note { get; set; }
         public TransferRequestStatus TransferStatus { get; set; }
+        public DateTime CreatedAt { get; set; }
+
     }
 }

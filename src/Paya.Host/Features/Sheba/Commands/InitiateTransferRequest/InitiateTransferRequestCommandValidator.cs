@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
 
-namespace Paya.Host.Features.Sheba.Commands.InitiateTransfer
+namespace Paya.Host.Features.Sheba.Commands.InitiateTransferRequest
 {
-    public class InitiateTransferCommandValidator : AbstractValidator<InitiateTransferCommand>
+    public class InitiateTransferRequestCommandValidator : AbstractValidator<InitiateTransferRequestCommand>
     {
-        public InitiateTransferCommandValidator()
+        public InitiateTransferRequestCommandValidator()
         {
             RuleFor(p => p.FromShebaNumber)
                 .Cascade(CascadeMode.Stop)

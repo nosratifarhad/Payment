@@ -1,6 +1,5 @@
-﻿using Paya.Host.Shared.Responses;
-using System.Net;
-using System.Text.Json;
+﻿using Paya.Host.Exceptions;
+using Paya.Host.Shared.Responses;
 
 namespace Paya.Host.Middlewares
 {
@@ -21,21 +20,23 @@ namespace Paya.Host.Middlewares
             {
                 await _next(context);
             }
+            catch (BusinessException ex)
+            {
+                context.Response.StatusCode = 400;
+                context.Response.ContentType = "application/json";
+                var error = new ErrorResponse { Message = ex.Message, Code = ex.Code };
+                await context.Response.WriteAsJsonAsync(error);
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unhandled exception occurred");
-
+                context.Response.StatusCode = 500;
                 context.Response.ContentType = "application/json";
-                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-
-                var response = new ErrorResponse
+                var error = new ErrorResponse
                 {
-                    Message = ex.Message,
-                    Code = ex.GetType().Name
+                    Message = "خطای غیرمنتظره‌ای رخ داده است",
+                    Code = "InternalServerError"
                 };
-
-                var json = JsonSerializer.Serialize(response);
-                await context.Response.WriteAsync(json);
+                await context.Response.WriteAsJsonAsync(error);
             }
         }
     }
