@@ -38,7 +38,8 @@ namespace Paya.Host.Features.Sheba.Commands.UpdateInitiateTransferRequest
                     BusinessErrorCodes.TransferRequestNotFound.ToString());
 
             if (transferRequestDto.Status != TransferRequestStatus.Pending.ToString())
-                throw new BusinessException("درخواست قبلاً پردازش شده", "InvalidStatusChange");
+                throw new BusinessException("درخواست قبلاً پردازش شده",
+                    BusinessErrorCodes.RequestAlreadyProcessed.ToString());
 
             await UpdateReserveAmount(request, transferRequestDto);
 
@@ -98,20 +99,10 @@ namespace Paya.Host.Features.Sheba.Commands.UpdateInitiateTransferRequest
 
         private SuccessResponse<TransferRequestDto> CreateSuccessResponse(TransferRequestDto transferRequestDto)
         {
-            var successTransferResponse = new TransferRequestDto()
-            {
-                Id = transferRequestDto.Id,
-                Status = transferRequestDto.Status.ToString(),
-                FromShebaNumber = transferRequestDto.FromShebaNumber,
-                ToShebaNumber = transferRequestDto.ToShebaNumber,
-                Price = transferRequestDto.Price,
-                CreatedAt = DateTime.Now
-            };
-
             var successResponse = new SuccessResponse<TransferRequestDto>()
             {
                 Message = "Request is Confirmed!",
-                request = successTransferResponse
+                request = transferRequestDto
             };
 
             return successResponse;

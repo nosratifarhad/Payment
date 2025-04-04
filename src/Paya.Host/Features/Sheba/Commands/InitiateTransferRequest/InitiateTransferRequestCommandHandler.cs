@@ -13,7 +13,6 @@ namespace Paya.Host.Features.Sheba.Commands.InitiateTransferRequest
     {
         private readonly ITransactionWriteRepository _transactionWriteRepository;
         private readonly ITransferWriteRepository _transferWriteRepository;
-
         private readonly IAccountService _accountService;
 
         public InitiateTransferRequestCommandHandler(
@@ -31,13 +30,9 @@ namespace Paya.Host.Features.Sheba.Commands.InitiateTransferRequest
         {
             //open database transaction
 
-            var reserveAmountDto = CreateReserveAmountDto(request);
+            await ReserveAmount(request);
 
-            await _accountService.ReserveAmount(reserveAmountDto);
-
-            var transferRequest = CreateTransferRequest(request);
-
-            transferRequest.Id = await InitiateTransferRequest(transferRequest);
+            var transferRequest = await InitiateTransferRequest(request);
 
             await CreateTransaction(request, transferRequest.Id);
 
@@ -48,12 +43,30 @@ namespace Paya.Host.Features.Sheba.Commands.InitiateTransferRequest
             return response;
         }
 
-        private async Task<int> InitiateTransferRequest(TransferRequest transferRequest)
+        private async Task ReserveAmount(InitiateTransferRequestCommand request)
         {
-            var transferRequestId =
+            var reserveAmountDto =
+                    new ReserveAmountDto(request.UserId, request.Price, request.FromShebaNumber);
+
+            await _accountService.ReserveAmount(reserveAmountDto);
+        }
+
+        private async Task<TransferRequest> InitiateTransferRequest(InitiateTransferRequestCommand request)
+        {
+            var transferRequest = new TransferRequest()
+            {
+                UserId = request.UserId,
+                FromShebaNumber = request.FromShebaNumber,
+                ToShebaNumber = request.ToShebaNumber,
+                Price = request.Price,
+                TransferStatus = TransferRequestStatus.Pending,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            transferRequest.Id =
                 await _transferWriteRepository.CreateTransferRequest(transferRequest);
 
-            return transferRequestId;
+            return transferRequest;
         }
 
         private async Task CreateTransaction(InitiateTransferRequestCommand request, int transferRequestId)
@@ -89,29 +102,6 @@ namespace Paya.Host.Features.Sheba.Commands.InitiateTransferRequest
             };
 
             return successResponse;
-        }
-
-        private ReserveAmountDto CreateReserveAmountDto(InitiateTransferRequestCommand request)
-        {
-            var reserveAmountDto =
-                new ReserveAmountDto(request.UserId, request.Price, request.FromShebaNumber);
-
-            return reserveAmountDto;
-        }
-
-        private TransferRequest CreateTransferRequest(InitiateTransferRequestCommand request)
-        {
-            var transferRequest = new TransferRequest()
-            {
-                UserId = request.UserId,
-                FromShebaNumber = request.FromShebaNumber,
-                ToShebaNumber = request.ToShebaNumber,
-                Price = request.Price,
-                TransferStatus = TransferRequestStatus.Pending,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            return transferRequest;
         }
     }
 }
