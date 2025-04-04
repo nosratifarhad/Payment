@@ -1,5 +1,4 @@
 ﻿using Paya.Host.Domain.Account;
-using Paya.Host.Domain.Transfer.Enums;
 using Paya.Host.Dtos;
 using Paya.Host.Exceptions;
 using Paya.Host.Services.Contracts;
@@ -36,24 +35,24 @@ namespace Paya.Host.Services
 
         public async Task UpdateReserveAmount(UpdateReserveAmountDto updateReserveAmountDto)
         {
-            var amount = await _accountReadRepository.GetUserAccount(updateReserveAmountDto.UserId);
-            if (amount == null)
+            var userAccount = await _accountReadRepository.GetUserAccount(updateReserveAmountDto.UserId);
+            if (userAccount == null)
                 throw new BusinessException("Amount Not Found",
                     ((int)BusinessErrorCodes.AmountNotFound).ToString());
 
             if (updateReserveAmountDto.Status == "Confirmed")
             {
-                amount.ReservedAmount = 0;
+                userAccount.Balance += updateReserveAmountDto.Price;
+                userAccount.ReservedAmount -= updateReserveAmountDto.Price;
             }
             if (updateReserveAmountDto.Status == "Canceled")
             {
-                amount.Balance += amount.ReservedAmount;
-                amount.ReservedAmount = 0;
+                userAccount.ReservedAmount -= updateReserveAmountDto.Price;
             }
 
-            amount.UpdateAt = DateTime.Now;
+            userAccount.UpdateAt = DateTime.Now;
 
-            await _accountWriteRepository.UpdateUserAccount(amount);
+            await _accountWriteRepository.UpdateUserAccount(userAccount);
         }
     }
 }
